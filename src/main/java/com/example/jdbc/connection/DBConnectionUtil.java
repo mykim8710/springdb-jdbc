@@ -1,2 +1,28 @@
-package com.example.jdbc.connection;public class DBConnectionUtil {
+package com.example.jdbc.connection;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import static com.example.jdbc.connection.ConnectionConst.*;
+
+@Slf4j
+public class DBConnectionUtil {
+    public static Connection getConnection() {
+        try {
+//            Connection connection = DriverManager.getConnection(ConnectionConstEnums.CONNECTION_URL.getContents(),
+//                                                                ConnectionConstEnums.CONNECTION_USERNAME.getContents(),
+//                                                                ConnectionConstEnums.CONNECTION_PASSWORD.getContents());
+
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+            log.info("connection = {}, class = {}", connection, connection.getClass());
+
+            return connection;
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 }
