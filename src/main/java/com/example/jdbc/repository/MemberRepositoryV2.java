@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MemberRepositoryV1 {
+public class MemberRepositoryV2 {
     private final DataSource dataSource;
 
     // 회원저장
@@ -70,6 +70,37 @@ public class MemberRepositoryV1 {
         }
     }
 
+    // 회원조회 : 커넥션 유지가 필요한 메서드
+    public Member findById(Connection con, String memberId) throws SQLException {
+        String sql = "SELECT * FROM member WHERE MEMBER_ID = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, memberId);
+            rs = pstmt.executeQuery();   // select Query, 실행 후 select 쿼리의 결과를 반환
+
+            if(rs.next()) {
+                Member member = new Member();
+                member.setMemberId(rs.getString("MEMBER_ID"));
+                member.setMoney(rs.getInt("MONEY"));
+
+                return member;
+            } else {
+                throw new NoSuchElementException("member not found, memberId = " +memberId);
+            }
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            JdbcUtils.closeResultSet(rs);
+            JdbcUtils.closeStatement(pstmt);
+            // JdbcUtils.closeConnection(con); : connection은 여기서 닫지 않는다.
+        }
+    }
+
     // 회원수정
     public void update(String memberId, int money) throws SQLException {
         String sql = "UPDATE member SET MONEY = ? WHERE MEMBER_ID=?";
@@ -91,6 +122,27 @@ public class MemberRepositoryV1 {
             close(con, pstmt, null);
         }
     }
+
+    // 회원수정 : 커넥션 유지가 필요한 메서드
+    public void update(Connection con, String memberId, int money) throws SQLException {
+        String sql = "UPDATE member SET MONEY = ? WHERE MEMBER_ID=?";
+
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, money);
+            pstmt.setString(2, memberId);
+
+            int resultSize = pstmt.executeUpdate();
+            log.info("resultSize={}", resultSize);
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            JdbcUtils.closeStatement(pstmt);
+        }
+    }
+
 
     // 회원삭제
     public void delete(String memberId) throws SQLException {
