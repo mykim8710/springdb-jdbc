@@ -2,6 +2,7 @@ package com.example.jdbc.repository.exception;
 
 public class MyDbException extends RuntimeException {
     public MyDbException() {
+
     }
 
     public MyDbException(String message) {
