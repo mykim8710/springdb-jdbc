@@ -13,3 +13,12 @@
     - Name: jdbc
     - Package name: com.example.jdbc
 - Dependencies: **JDBC API, H2 DataBase, Lombok**
+
+
+## Study 목록
+- JDBC
+- 커넥션풀과 데이터소스 이해
+- 트랜잭션 이해
+- 스프링 적용 - 트랜잭션
+- 자바 예외
+- 스프링 적용 - 예외 처리, 반복
